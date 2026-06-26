@@ -14,18 +14,15 @@ export const initialize = async ({
     );
 
     const faceLandmarker =
-      await FaceLandmarker.createFromOptions(
-        vision,
-        {
-          baseOptions: {
-            modelAssetPath:
-              "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
-          },
-          runningMode: "VIDEO",
-          outputFaceBlendshapes: true,
-          numFaces: 1,
-        }
-      );
+      await FaceLandmarker.createFromOptions(vision, {
+        baseOptions: {
+          modelAssetPath:
+            "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+        },
+        runningMode: "VIDEO",
+        outputFaceBlendshapes: true,
+        numFaces: 1,
+      });
 
     faceLandmarkerRef.current = faceLandmarker;
 
@@ -34,12 +31,11 @@ export const initialize = async ({
         video: true,
       });
 
-    videoRef.current.srcObject =
-      streamRef.current;
+    videoRef.current.srcObject = streamRef.current;
 
     await videoRef.current.play();
 
-    console.log("Camera Ready");
+    console.log("✅ Camera Ready");
   } catch (error) {
     console.error("Initialization Error:", error);
   }
@@ -61,8 +57,6 @@ export const detectFace = ({
       videoRef.current,
       performance.now()
     );
-
-  console.log("MediaPipe Results:", results);
 
   if (
     results.faceBlendshapes &&

@@ -1,0 +1,577 @@
+// ── Moodify Player Styles ──────────────────────────────────────
+// Premium glassmorphism music player with dynamic animations
+
+// ── Color Tokens ──
+$bg-dark: #0d0d0d;
+$surface: rgba(255, 255, 255, 0.04);
+$surface-hover: rgba(255, 255, 255, 0.08);
+$glass: rgba(255, 255, 255, 0.06);
+$glass-border: rgba(255, 255, 255, 0.1);
+$text-primary: #f0f0f0;
+$text-secondary: rgba(255, 255, 255, 0.55);
+$accent-gradient: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+$accent-primary: #a855f7;
+$accent-glow: rgba(168, 85, 247, 0.35);
+
+// ── Mood Colors ──
+$mood-colors: (
+  happy: #fbbf24,
+  sad: #60a5fa,
+  angry: #ef4444,
+  romantic: #ec4899,
+  chill: #34d399,
+  energetic: #f97316,
+  melancholy: #818cf8,
+);
+
+// ── Keyframes ──
+@keyframes vinylSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes posterPulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(168, 85, 247, 0.15); }
+  50% { box-shadow: 0 0 50px rgba(168, 85, 247, 0.3); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spinnerRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes bgFloat {
+  0%, 100% { transform: scale(1.15) translate(0, 0); }
+  25% { transform: scale(1.2) translate(2%, -1%); }
+  50% { transform: scale(1.18) translate(-1%, 2%); }
+  75% { transform: scale(1.22) translate(1%, 1%); }
+}
+
+// ── Player Root ──
+.moodify-player {
+  position: relative;
+  width: 100%;
+  padding: 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  flex: 1;
+}
+
+// ── Background ──
+.player__bg {
+  position: absolute;
+  inset: -40px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(80px) saturate(1.4) brightness(0.25);
+  opacity: 0.7;
+  z-index: 0;
+  animation: bgFloat 20s ease-in-out infinite;
+  transition: background-image 1s ease;
+}
+
+// ── Main Container ──
+.player__container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  width: 100%;
+  max-width: 420px;
+  padding: 40px 32px 36px;
+  background: $glass;
+  backdrop-filter: blur(40px) saturate(1.6);
+  -webkit-backdrop-filter: blur(40px) saturate(1.6);
+  border: 1px solid $glass-border;
+  border-radius: 28px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  animation: fadeSlideUp 0.6s ease-out;
+}
+
+// ── Poster ──
+.player__poster {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  border-radius: 20px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.5s ease;
+
+  &.playing {
+    animation: posterPulse 3s ease-in-out infinite;
+    transform: scale(1.03);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.8s ease;
+  }
+
+  &.playing img {
+    transform: scale(1.08);
+  }
+
+  &:hover img {
+    transform: scale(1.05);
+  }
+}
+
+.player__poster-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $surface;
+
+  svg {
+    width: 60px;
+    height: 60px;
+    color: $text-secondary;
+  }
+}
+
+.player__vinyl-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+
+  .playing & {
+    border-color: rgba(168, 85, 247, 0.2);
+  }
+}
+
+// ── Song Info ──
+.player__info {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.player__title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: $text-primary;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player__mood {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 14px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border-radius: 20px;
+  background: $surface;
+  border: 1px solid $glass-border;
+  color: $text-secondary;
+  transition: all 0.3s ease;
+
+  @each $mood, $color in $mood-colors {
+    &--#{$mood} {
+      color: $color;
+      background: rgba($color, 0.1);
+      border-color: rgba($color, 0.25);
+    }
+  }
+}
+
+// ── Progress Bar ──
+.player__progress-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.player__time {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: $text-secondary;
+  min-width: 36px;
+  font-variant-numeric: tabular-nums;
+
+  &:last-child {
+    text-align: right;
+  }
+}
+
+.player__progress-bar {
+  flex: 1;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px 0;
+}
+
+.player__progress-track {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: visible;
+  transition: height 0.2s ease;
+
+  .player__progress-bar:hover & {
+    height: 6px;
+  }
+}
+
+.player__progress-fill {
+  height: 100%;
+  background: $accent-gradient;
+  border-radius: 4px;
+  position: relative;
+  transition: width 0.1s linear;
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    height: 100%;
+    background: $accent-gradient;
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+    border-radius: 4px;
+    opacity: 0.5;
+  }
+}
+
+.player__progress-thumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px $accent-glow, 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  .player__progress-bar:hover & {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+// ── Controls ──
+.player__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.player__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: $text-primary;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover {
+    color: #fff;
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// Play Button
+.player__btn--play {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: $accent-gradient;
+  color: #fff;
+  box-shadow: 0 4px 20px $accent-glow;
+  margin: 0 8px;
+
+  svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  &:hover {
+    box-shadow: 0 6px 30px rgba(168, 85, 247, 0.5);
+    transform: scale(1.08);
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
+
+  &.buffering {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+}
+
+.player__spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spinnerRotate 0.8s linear infinite;
+}
+
+// Skip Buttons
+.player__btn--skip {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: $surface;
+  border: 1px solid $glass-border;
+  position: relative;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: $surface-hover;
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+}
+
+.player__skip-label {
+  position: absolute;
+  bottom: 2px;
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: $text-secondary;
+  pointer-events: none;
+}
+
+// Speed Button
+.player__btn--speed {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 16px;
+  background: $surface;
+  border: 1px solid $glass-border;
+  color: $accent-primary;
+  letter-spacing: 0.02em;
+  min-width: 48px;
+
+  &:hover {
+    background: $surface-hover;
+    border-color: rgba(168, 85, 247, 0.3);
+  }
+}
+
+.player__speed-wrapper {
+  position: relative;
+}
+
+.player__speed-menu {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  background: rgba(20, 20, 20, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid $glass-border;
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  z-index: 20;
+  animation: fadeSlideUp 0.2s ease-out;
+  min-width: 70px;
+}
+
+.player__speed-option {
+  display: block;
+  width: 100%;
+  padding: 8px 14px;
+  background: none;
+  border: none;
+  color: $text-secondary;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  text-align: center;
+
+  &:hover {
+    background: $surface-hover;
+    color: #fff;
+  }
+
+  &.active {
+    color: $accent-primary;
+    background: rgba(168, 85, 247, 0.12);
+  }
+}
+
+// Volume
+.player__volume-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.player__btn--volume {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: $surface;
+  }
+}
+
+.player__volume-bar {
+  width: 70px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 6px 0;
+}
+
+.player__volume-track {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  transition: height 0.2s ease;
+
+  .player__volume-bar:hover & {
+    height: 5px;
+  }
+}
+
+.player__volume-fill {
+  height: 100%;
+  background: linear-gradient(90deg, $accent-primary, #ec4899);
+  border-radius: 3px;
+  transition: width 0.1s ease;
+}
+
+// ── Responsive ──
+@media (max-width: 480px) {
+  .player__container {
+    max-width: 100%;
+    margin: 0 12px;
+    padding: 28px 20px 28px;
+    border-radius: 22px;
+  }
+
+  .player__poster {
+    width: 180px;
+    height: 180px;
+  }
+
+  .player__title {
+    font-size: 1.05rem;
+  }
+
+  .player__controls {
+    gap: 4px;
+  }
+
+  .player__btn--play {
+    width: 56px;
+    height: 56px;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .player__btn--skip {
+    width: 38px;
+    height: 38px;
+  }
+
+  .player__volume-wrapper {
+    display: none;
+  }
+}
+
+@media (max-width: 360px) {
+  .player__poster {
+    width: 150px;
+    height: 150px;
+  }
+
+  .player__container {
+    padding: 20px 16px;
+    gap: 20px;
+  }
+}

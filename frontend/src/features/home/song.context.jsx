@@ -2,7 +2,7 @@ import { createContext } from "react";
 import { useState } from "react";
 
 
-export const songContext = createContext()
+export const SongContext = createContext()
 
 export const SongContextProvider =({ children })=>{
 
@@ -13,11 +13,10 @@ export const SongContextProvider =({ children })=>{
         "mood": "sad",
   })
 
-  const [loading , setloading ] =useState(false)
+  const [loading , setLoading ] =useState(false)
   return (
-    <SongContext.Provider value ={{loading, setLoading, song, setSong}}>
+    <SongContext.Provider value={{loading, setLoading, song, setSong}}>
       {children}
-
     </SongContext.Provider>
   )
 }
